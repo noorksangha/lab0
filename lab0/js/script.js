@@ -1,26 +1,25 @@
-//used chatgpt 
-import messages from '../lang/messages/en/user.js';
-class Button {
+//used chatgpt to help code.
+import userMessages from '../lang/messages/en/user.js';
+
+class CustomButton {
   constructor(x, y, color, text) {
-    this.x = x;
-    this.y = y;
-    this.color = color;
-    this.text = text;
+    this.xPosition = x;
+    this.yPosition = y;
+    this.buttonColor = color;
+    this.buttonText = text;
     this.element = null;
   }
-
 
   createButton() {
     this.element = document.createElement("button");
     this.element.style.height = "5em";
     this.element.style.width = "10em";
-    this.element.style.backgroundColor = this.color;
-    this.element.innerText = this.text;
+    this.element.style.backgroundColor = this.buttonColor;
+    this.element.innerText = this.buttonText;
     this.element.style.position = "absolute";
-    this.element.style.left = `${this.x}px`;
-    this.element.style.top = `${this.y}px`;
+    this.element.style.left = `${this.xPosition}px`;
+    this.element.style.top = `${this.yPosition}px`;
     document.getElementById("buttonContainer").appendChild(this.element);
-   
   }
 
   moveButton(newX, newY) {
@@ -29,63 +28,57 @@ class Button {
   }
 }
 
-class ButtonGame {
+class ButtonGameController {
   constructor() {
     this.buttons = [];
     this.buttonContainer = document.getElementById("buttonContainer");
-    this.goButton = document.getElementById("goButton");
+    this.startButton = document.getElementById("goButton");
     this.numInput = document.getElementById("numButtons");
 
-    this.goButton.addEventListener("click", () => this.createButtons());
-  
+    this.startButton.addEventListener("click", () => this.createButtons());
   }
 
-
   createButtons() {
-    const num = parseInt(this.numInput.value);
+    const numberOfButtons = parseInt(this.numInput.value);
 
-    if (num >= 3 && num <= 7) {
+    if (numberOfButtons >= 3 && numberOfButtons <= 7) {
       this.clearButtons();
 
-      const totalWidth = num * 10 * 16; 
-      let startingX = (window.innerWidth - totalWidth) / 2; 
-      startingX = startingX < 0 ? 0 : startingX; 
+      const totalWidth = numberOfButtons * 10 * 16;
+      let startingX = (window.innerWidth - totalWidth) / 2;
+      startingX = startingX < 0 ? 0 : startingX;
 
-      const startY = 300; 
+      const startY = 300;
 
-      for (let i = 0; i < num; i++) {
-        const button = new Button(
-            startingX + i * (10 * 16), 
-            startY, 
-            this.getRandomColor(),
-            `${i + 1}`
+      for (let i = 0; i < numberOfButtons; i++) {
+        const button = new CustomButton(
+          startingX + i * (10 * 16),
+          startY,
+          this.getRandomColor(),
+          `${i + 1}`
         );
         button.createButton();
         this.buttons.push(button);
       }
 
-      
-      setTimeout(() => this.scatterButtons(num), num * 1000);
+      setTimeout(() => this.scatterButtons(numberOfButtons), numberOfButtons * 1000);
     } else {
-      alert(messages.enterNumber);
+      alert(userMessages.enterNumber);
     }
   }
-
-
 
   clearButtons() {
     this.buttonContainer.innerHTML = "";
     this.buttons = [];
   }
 
-  scatterButtons(num) {
-    let scatterCount = 0; 
+  scatterButtons(numberOfButtons) {
+    let scatterCount = 0;
 
     const scatterInterval = setInterval(() => {
       const scatterPromises = [];
 
-  
-      for (let i = 0; i < num; i++) {
+      for (let i = 0; i < numberOfButtons; i++) {
         const button = this.buttons[i];
         const newX = Math.random() * (window.innerWidth - 100);
         const newY = Math.random() * (window.innerHeight - 50);
@@ -101,48 +94,47 @@ class ButtonGame {
       Promise.all(scatterPromises).then(() => {
         scatterCount++;
 
-        if (scatterCount === num) {
+        if (scatterCount === numberOfButtons) {
           clearInterval(scatterInterval);
           this.removeButtonText();
           this.enableButtonInteraction();
         }
       });
-    }, 2000); 
+    }, 2000);
   }
 
-
-removeButtonText() {
+  removeButtonText() {
     this.buttons.forEach(button => button.element.innerText = " ");
   }
 
   enableButtonInteraction() {
     let clickCount = 0;
 
-    const originalOrder = this.buttons.map(button => button.text);
+    const originalOrder = this.buttons.map(button => button.buttonText);
 
-    this.buttons.forEach((button,index) => {
-      button.element.addEventListener('click',() => {
-        if(button.text === originalOrder[clickCount]) {
-          button.element.innerText = button.text; 
+    this.buttons.forEach((button, index) => {
+      button.element.addEventListener('click', () => {
+        if (button.buttonText === originalOrder[clickCount]) {
+          button.element.innerText = button.buttonText;
           clickCount++;
           if (clickCount === originalOrder.length) {
             setTimeout(() => {
-              alert(messages.excellentMemory)
+              alert(userMessages.excellentMemory);
             }, 100);
           }
         } else {
-          alert(messages.wrongOrder);
+          alert(userMessages.wrongOrder);
           this.revealCorrectOrder();
         }
-      })
-    })
+      });
+    });
   }
 
   revealCorrectOrder() {
     this.buttons.forEach(button => {
-      button.element.innerText = button.text;
-      button.element.disabled = true; 
-    })
+      button.element.innerText = button.buttonText;
+      button.element.disabled = true;
+    });
   }
 
   getRandomColor() {
@@ -155,4 +147,4 @@ removeButtonText() {
   }
 }
 
-const game = new ButtonGame(); 
+const gameController = new ButtonGameController();
