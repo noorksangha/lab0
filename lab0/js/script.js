@@ -1,3 +1,4 @@
+//chatGPT was used to help with code.
 import messages from '../lang/messages/en/user.js';
 
 class ColoredButton {
