@@ -1,6 +1,6 @@
-
 import messages from '../lang/messages/en/user.js';
-class Button {
+
+class ColoredButton {
   constructor(x, y, color, text) {
     this.x = x;
     this.y = y;
@@ -8,7 +8,6 @@ class Button {
     this.text = text;
     this.element = null;
   }
-
 
   createButton() {
     this.element = document.createElement("button");
@@ -20,7 +19,6 @@ class Button {
     this.element.style.left = `${this.x}px`;
     this.element.style.top = `${this.y}px`;
     document.getElementById("buttonContainer").appendChild(this.element);
-   
   }
 
   moveButton(newX, newY) {
@@ -29,69 +27,63 @@ class Button {
   }
 }
 
-class ButtonGame {
+class ColorButtonGame {
   constructor() {
-    this.buttons = [];
+    this.coloredButtons = [];
     this.buttonContainer = document.getElementById("buttonContainer");
-    this.goButton = document.getElementById("goButton");
+    this.startButton = document.getElementById("startButton");
     this.numInput = document.getElementById("numButtons");
 
-    this.goButton.addEventListener("click", () => this.createButtons());
-  
+    this.startButton.addEventListener("click", () => this.createColoredButtons());
   }
 
-
-  createButtons() {
+  createColoredButtons() {
     const num = parseInt(this.numInput.value);
 
     if (num >= 3 && num <= 7) {
-      this.clearButtons();
+      this.clearColoredButtons();
 
-      const totalWidth = num * 10 * 16; 
-      let startingX = (window.innerWidth - totalWidth) / 2; 
-      startingX = startingX < 0 ? 0 : startingX; 
+      const totalWidth = num * 10 * 16;
+      let startingX = (window.innerWidth - totalWidth) / 2;
+      startingX = startingX < 0 ? 0 : startingX;
 
-      const startY = 300; 
+      const startY = 300;
 
       for (let i = 0; i < num; i++) {
-        const button = new Button(
-            startingX + i * (10 * 16), 
-            startY, 
-            this.getRandomColor(),
-            `${i + 1}`
+        const coloredButton = new ColoredButton(
+          startingX + i * (10 * 16),
+          startY,
+          this.getRandomColor(),
+          `${i + 1}`
         );
-        button.createButton();
-        this.buttons.push(button);
+        coloredButton.createButton();
+        this.coloredButtons.push(coloredButton);
       }
 
-      
-      setTimeout(() => this.scatterButtons(num), num * 1000);
+      setTimeout(() => this.scatterColoredButtons(num), num * 1000);
     } else {
       alert(messages.enterNumber);
     }
   }
 
-
-
-  clearButtons() {
+  clearColoredButtons() {
     this.buttonContainer.innerHTML = "";
-    this.buttons = [];
+    this.coloredButtons = [];
   }
 
-  scatterButtons(num) {
-    let scatterCount = 0; 
+  scatterColoredButtons(num) {
+    let scatterCount = 0;
 
     const scatterInterval = setInterval(() => {
       const scatterPromises = [];
 
-  
       for (let i = 0; i < num; i++) {
-        const button = this.buttons[i];
+        const coloredButton = this.coloredButtons[i];
         const newX = Math.random() * (window.innerWidth - 100);
         const newY = Math.random() * (window.innerHeight - 50);
 
         const movePromise = new Promise((resolve) => {
-          button.moveButton(newX, newY);
+          coloredButton.moveButton(newX, newY);
           resolve();
         });
 
@@ -107,42 +99,41 @@ class ButtonGame {
           this.enableButtonInteraction();
         }
       });
-    }, 2000); 
+    }, 2000);
   }
 
-
-removeButtonText() {
-    this.buttons.forEach(button => button.element.innerText = " ");
+  removeButtonText() {
+    this.coloredButtons.forEach((coloredButton) => (coloredButton.element.innerText = " "));
   }
 
   enableButtonInteraction() {
     let clickCount = 0;
 
-    const originalOrder = this.buttons.map(button => button.text);
+    const originalOrder = this.coloredButtons.map((coloredButton) => coloredButton.text);
 
-    this.buttons.forEach((button,index) => {
-      button.element.addEventListener('click',() => {
-        if(button.text === originalOrder[clickCount]) {
-          button.element.innerText = button.text; 
+    this.coloredButtons.forEach((coloredButton, index) => {
+      coloredButton.element.addEventListener("click", () => {
+        if (coloredButton.text === originalOrder[clickCount]) {
+          coloredButton.element.innerText = coloredButton.text;
           clickCount++;
           if (clickCount === originalOrder.length) {
             setTimeout(() => {
-              alert(messages.excellentMemory)
+              alert(messages.excellentMemory);
             }, 100);
           }
         } else {
           alert(messages.wrongOrder);
           this.revealCorrectOrder();
         }
-      })
-    })
+      });
+    });
   }
 
   revealCorrectOrder() {
-    this.buttons.forEach(button => {
-      button.element.innerText = button.text;
-      button.element.disabled = true; 
-    })
+    this.coloredButtons.forEach((coloredButton) => {
+      coloredButton.element.innerText = coloredButton.text;
+      coloredButton.element.disabled = true;
+    });
   }
 
   getRandomColor() {
@@ -155,4 +146,4 @@ removeButtonText() {
   }
 }
 
-const game = new ButtonGame();
+const game = new ColorButtonGame();
